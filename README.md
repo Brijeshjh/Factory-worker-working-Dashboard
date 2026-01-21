@@ -67,10 +67,11 @@ Overview of the system architecture:
 
 ```mermaid
 graph TD
-    User[User Browser] -->|HTTP/80| Frontend[Frontend Container<br>(React + Vite)]
+    User[User Browser] -->|HTTP/80| Frontend
     
-    subgraph Docker Host
-        Frontend -->|HTTP/JSON| Backend[Backend Container<br>(FastAPI)]
+    subgraph "Docker Host"
+        Frontend[Frontend Container<br>React + Vite]
+        Frontend -->|HTTP/JSON| Backend[Backend Container<br>FastAPI]
         Backend -->|SQLAlchemy| DB[(SQLite Database<br>factory.db)]
     end
 ```
@@ -130,22 +131,32 @@ sequenceDiagram
 flowchart TD
     A[Start: Calculate Metrics] --> B[Fetch All Workers]
     B --> C{For Each Worker}
+    
+    %% Outer Loop: Worker Processing
     C -->|Next Worker| D[Fetch Events for Worker]
     D --> E[Sort Events by Timestamp]
-    E --> F[Iterate Events (i, i+1)]
-    F --> G[Calculate Duration (Next - Current)]
+    E --> F["Iterate Events (i, i+1)"]
+    
+    %% Inner Loop: Event Processing
+    F --> G["Calculate Duration (Next - Current)"]
     G --> H{Event Type?}
+    
     H -->|Working| I[Add to Active Time]
     H -->|Idle| J[Add to Idle Time]
     H -->|Product Count| K[Add to Total Units]
-    I --> L[Next Event Pair]
+    
+    I --> L
     J --> L
     K --> L
-    L --> M{End of Events?}
+    
+    L[Next Event Pair] --> M{End of Events?}
     M -->|No| F
+    
+    %% Aggregation
     M -->|Yes| N[Calculate Utilization %]
     N --> O[Calculate Units/Hour]
     O --> C
+    
     C -->|Done| P[Aggregate Factory Metrics]
     P --> Q[Return Dashboard Data]
 ```
