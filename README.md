@@ -68,12 +68,10 @@ Overview of the system architecture:
 ```mermaid
 graph TD
     User[User Browser] -->|HTTP/80| Frontend[Frontend Container<br>(React + Vite)]
-    Frontend -->|HTTP/JSON| Backend[Backend Container<br>(FastAPI)]
-    Backend -->|SQLAlchemy| DB[(SQLite Database<br>factory.db)]
+    
     subgraph Docker Host
-        Frontend
-        Backend
-        DB
+        Frontend -->|HTTP/JSON| Backend[Backend Container<br>(FastAPI)]
+        Backend -->|SQLAlchemy| DB[(SQLite Database<br>factory.db)]
     end
 ```
 
